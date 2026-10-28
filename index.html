@@ -3,531 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduScramble: Susun Huruf & Kalimat</title>
+  <title>EduScramble - Game Susun Huruf & Kalimat</title>
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --secondary: #06b6d4;
-      --success: #10b981;
-      --error: #ef4444;
-      --bg-start: #e0e7ff;
-      --bg-end: #fae8ff;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --text-main: #1e1b4b;
-      --text-muted: #64748b;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 15px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-family: 'Fredoka', cursive;
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
-      color: var(--primary);
-      margin-bottom: 5px;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .top-controls {
-      background: var(--card-bg);
-      padding: 12px 20px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.1);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 750px;
-    }
-
-    .select-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    select {
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 2px solid #cbd5e1;
-      font-weight: 700;
-      color: var(--text-main);
-      outline: none;
-      cursor: pointer;
-    }
-
-    .stats-bar {
-      display: flex;
-      gap: 20px;
-      font-weight: 800;
-      font-size: 0.95rem;
-    }
-
-    .stat-val {
-      color: var(--primary);
-    }
-
-    .game-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 25px;
-      width: 100%;
-      max-width: 750px;
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .hint-box {
-      background: #f1f5f9;
-      border-left: 5px solid var(--secondary);
-      padding: 14px 18px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .hint-text {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #334155;
-    }
-
-    .btn-audio {
-      background: #e0e7ff;
-      color: var(--primary);
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-
-    .btn-audio:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    .answer-zone {
-      min-height: 85px;
-      background: #ffffff;
-      border: 3px dashed #cbd5e1;
-      border-radius: 18px;
-      padding: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-    }
-
-    .answer-zone.correct {
-      border-color: var(--success);
-      background: #ecfdf5;
-    }
-
-    .answer-zone.shake {
-      border-color: var(--error);
-      animation: shakeAnim 0.4s ease-in-out;
-    }
-
-    @keyframes shakeAnim {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
-    }
-
-    .word-bank {
-      min-height: 85px;
-      background: #f8fafc;
-      border-radius: 18px;
-      padding: 15px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Kepingan Huruf / Kata */
-    .chip {
-      background: #ffffff;
-      color: var(--text-main);
-      font-weight: 800;
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      min-width: 44px;
-      height: 48px;
-      padding: 0 14px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
-      cursor: pointer;
-      border: 2px solid #e2e8f0;
-      transition: all 0.15s ease;
-    }
-
-    .chip:hover {
-      transform: translateY(-2px);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .chip:active {
-      transform: scale(0.95);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: 800;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-secondary {
-      background: #f1f5f9;
-      color: var(--text-main);
-    }
-
-    .btn-secondary:hover {
-      background: #e2e8f0;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      z-index: 100;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal-box {
-      background: white;
-      border-radius: 24px;
-      padding: 35px;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    }
-
-    .modal-box h2 {
-      font-family: 'Fredoka', cursive;
-      font-size: 2rem;
-      color: var(--primary);
-    }
-  </style>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Floating Educational Doodles -->
+  <div class="doodle doodle-1">🎓</div>
+  <div class="doodle doodle-2">📚</div>
+  <div class="doodle doodle-3">✏️</div>
+  <div class="doodle doodle-4">⭐</div>
+  <div class="doodle doodle-5">💡</div>
+  <div class="doodle doodle-6">⚛️</div>
+
+  <!-- Canvas Kembang Api -->
+  <canvas id="fireworks"></canvas>
+
   <header>
+    <div class="brand-badge">✨ EDUSCRAMBLE INTERAKTIF</div>
     <h1>EduScramble Game</h1>
-    <p class="subtitle">Susun huruf menjadi kata, atau susun kata menjadi kalimat!</p>
+    <p class="subtitle">Susun huruf teracak menjadi kata, atau susun kata menjadi kalimat yang padu!</p>
   </header>
 
   <div class="top-controls">
-    <div class="select-group">
-      <label for="materi-select"><strong>Materi:</strong></label>
+    <div class="control-group">
+      <label for="materi-select">📖 MATERI</label>
       <select id="materi-select"></select>
     </div>
 
+    <div class="control-group">
+      <label for="time-select">⏱️ BATAS WAKTU</label>
+      <select id="time-select">
+        <option value="unlimited">♾️ Tanpa Batas</option>
+        <option value="180" selected>⏱️ 3 Menit</option>
+        <option value="300">⏱️ 5 Menit</option>
+        <option value="420">⏱️ 7 Menit</option>
+      </select>
+    </div>
+
     <div class="stats-bar">
-      <div>Soal: <span class="stat-val" id="progress-text">1/5</span></div>
-      <div>Skor: <span class="stat-val" id="score-text">0</span></div>
-      <div>Waktu: <span class="stat-val" id="timer-text">00:00</span></div>
+      <div class="stat-box">
+        <small>Waktu</small>
+        <span id="timer-text" class="stat-value">03:00</span>
+      </div>
+      <div class="stat-box">
+        <small>Progres</small>
+        <span id="progress-text" class="stat-value">1/5</span>
+      </div>
+      <div class="stat-box">
+        <small>Skor</small>
+        <span id="score-text" class="stat-value">⭐ 0</span>
+      </div>
     </div>
   </div>
 
-  <div class="game-card">
-    <div class="hint-box">
-      <div>
-        <small style="color: var(--text-muted); font-weight:700;">PETUNJUK ARTI:</small>
-        <div class="hint-text" id="hint-text">-</div>
+  <main class="game-card">
+    <div class="hint-card">
+      <div class="hint-info">
+        <span class="mode-tag" id="mode-tag">MODE SUSUN HURUF</span>
+        <div class="hint-text" id="hint-text">Menyiapkan petunjuk...</div>
       </div>
-      <button class="btn-audio" id="audio-btn">🔊 Suara</button>
+      <button class="btn-audio" id="audio-btn" title="Dengarkan Pengucapan Suara">
+        <span>🔊</span>
+        <span>Dengarkan Suara</span>
+      </button>
     </div>
 
-    <div class="answer-zone" id="answer-zone"></div>
-    <div class="word-bank" id="word-bank"></div>
+    <!-- Area Kotak Jawaban (Tempat Menyusun) -->
+    <div class="zone-wrapper">
+      <small class="zone-label">KOTAK JAWABAN KAMU:</small>
+      <div class="answer-zone" id="answer-zone"></div>
+    </div>
+
+    <!-- Area Bank Kepingan (Huruf/Kata Acak) -->
+    <div class="zone-wrapper">
+      <small class="zone-label">PILIH KEPINGAN DI BAWAH INI:</small>
+      <div class="word-bank" id="word-bank"></div>
+    </div>
 
     <div class="action-buttons">
-      <button class="btn btn-secondary" id="reset-btn">🔄 Reset</button>
+      <button class="btn btn-secondary" id="reset-btn">🔄 Acak Ulang</button>
       <button class="btn btn-primary" id="check-btn">✔ Periksa Jawaban</button>
     </div>
-  </div>
+  </main>
 
+  <!-- Modal Kemenangan -->
   <div class="modal-overlay" id="victory-modal">
     <div class="modal-box">
+      <div class="modal-icon">🏆</div>
       <h2>Luar Biasa! 🎉</h2>
-      <div style="font-size: 2.5rem; margin: 10px 0;">⭐⭐⭐</div>
-      <p>Kamu berhasil menyelesaikan semua tantangan!</p>
-      <br>
-      <p><strong>Total Skor:</strong> <span id="final-score">0</span></p>
-      <p><strong>Waktu:</strong> <span id="final-time">00:00</span></p>
-      <br>
-      <button class="btn btn-primary" onclick="initGame()">Main Lagi</button>
+      <div class="stars" id="star-rating">⭐⭐⭐</div>
+      <p>Kamu berhasil menyelesaikan seluruh tantangan!</p>
+      
+      <div class="modal-stats">
+        <div class="modal-stat-item">
+          <small>Total Skor</small>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="modal-stat-item">
+          <small>Waktu Penyelesaian</small>
+          <strong id="final-time">00:00</strong>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="initGame()">🚀 Main Lagi</button>
     </div>
   </div>
 
+  <!-- Modal Waktu Habis -->
+  <div class="modal-overlay" id="timeout-modal">
+    <div class="modal-box">
+      <div class="modal-icon">⌛</div>
+      <h2>Waktu Habis!</h2>
+      <p>Jangan menyerah, ayo coba lagi untuk menyelesaikan semua soal!</p>
+      <button class="btn btn-primary btn-full" onclick="initGame()">🔄 Coba Lagi</button>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
   <script src="materi.js"></script>
-
-  <script>
-    const DEFAULT_MATERI = [
-      {
-        id: "vocab-past-tense",
-        judul: "[Susun Huruf] Past Tense Verbs",
-        type: "word",
-        lang: "en-US",
-        items: [
-          { target: "ENCOURAGED", hint: "Mendorong / Memberi semangat" },
-          { target: "ARRIVED", hint: "Tiba / Sampai" },
-          { target: "MANAGED", hint: "Mengelola" }
-        ]
-      },
-      {
-        id: "sentence-past-tense",
-        judul: "[Susun Kalimat] Past Tense Sentences",
-        type: "sentence",
-        lang: "en-US",
-        items: [
-          { target: "She walked to school yesterday", hint: "Dia berjalan ke sekolah kemarin" }
-        ]
-      }
-    ];
-
-    const DATA = (typeof DAFTAR_MATERI_SCRAMBLE !== 'undefined') ? DAFTAR_MATERI_SCRAMBLE : DEFAULT_MATERI;
-
-    let currentTopicIndex = 0;
-    let currentItemIndex = 0;
-    let selectedPieces = [];
-    let bankPieces = [];
-    let score = 0;
-    let timerSeconds = 0;
-    let timerInterval = null;
-
-    const materiSelect = document.getElementById('materi-select');
-    const hintTextEl = document.getElementById('hint-text');
-    const answerZoneEl = document.getElementById('answer-zone');
-    const wordBankEl = document.getElementById('word-bank');
-    const progressTextEl = document.getElementById('progress-text');
-    const scoreTextEl = document.getElementById('score-text');
-    const timerTextEl = document.getElementById('timer-text');
-    const checkBtn = document.getElementById('check-btn');
-    const resetBtn = document.getElementById('reset-btn');
-    const audioBtn = document.getElementById('audio-btn');
-    const victoryModal = document.getElementById('victory-modal');
-
-    function setupDropdown() {
-      materiSelect.innerHTML = '';
-      DATA.forEach((m, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.textContent = m.judul;
-        materiSelect.appendChild(opt);
-      });
-    }
-
-    function initGame() {
-      currentTopicIndex = parseInt(materiSelect.value) || 0;
-      currentItemIndex = 0;
-      score = 0;
-      timerSeconds = 0;
-      
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timerSeconds++;
-        const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-        const secs = String(timerSeconds % 60).padStart(2, '0');
-        timerTextEl.textContent = `${mins}:${secs}`;
-      }, 1000);
-
-      victoryModal.classList.remove('active');
-      loadItem();
-    }
-
-    function loadItem() {
-      const topic = DATA[currentTopicIndex];
-      const itemObj = topic.items[currentItemIndex];
-
-      progressTextEl.textContent = `${currentItemIndex + 1}/${topic.items.length}`;
-      scoreTextEl.textContent = score;
-      hintTextEl.textContent = itemObj.hint;
-
-      // Cek apakah mode Susun Huruf ('word') atau Susun Kalimat ('sentence')
-      const targetStr = itemObj.target;
-      let rawArray = (topic.type === 'word') ? targetStr.toUpperCase().split('') : targetStr.split(' ');
-
-      bankPieces = [...rawArray];
-      if (bankPieces.length > 1) {
-        do {
-          bankPieces.sort(() => Math.random() - 0.5);
-        } while (bankPieces.join(topic.type === 'word' ? '' : ' ') === targetStr);
-      }
-
-      selectedPieces = [];
-      answerZoneEl.classList.remove('correct', 'shake');
-      renderChips();
-    }
-
-    function renderChips() {
-      answerZoneEl.innerHTML = '';
-      selectedPieces.forEach((piece, idx) => {
-        const chip = createChip(piece, () => {
-          selectedPieces.splice(idx, 1);
-          bankPieces.push(piece);
-          renderChips();
-        });
-        answerZoneEl.appendChild(chip);
-      });
-
-      wordBankEl.innerHTML = '';
-      bankPieces.forEach((piece, idx) => {
-        const chip = createChip(piece, () => {
-          bankPieces.splice(idx, 1);
-          selectedPieces.push(piece);
-          renderChips();
-        });
-        wordBankEl.appendChild(chip);
-      });
-    }
-
-    function createChip(text, onClick) {
-      const chip = document.createElement('div');
-      chip.className = 'chip';
-      chip.textContent = text;
-      chip.onclick = onClick;
-      return chip;
-    }
-
-    function speakText(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = DATA[currentTopicIndex].lang || 'en-US';
-        utterance.rate = 0.85;
-        window.speechSynthesis.speak(utterance);
-      }
-    }
-
-    checkBtn.addEventListener('click', () => {
-      const topic = DATA[currentTopicIndex];
-      const targetStr = topic.items[currentItemIndex].target;
-      const joinChar = (topic.type === 'word') ? '' : ' ';
-      const userStr = selectedPieces.join(joinChar);
-
-      if (userStr.toLowerCase() === targetStr.toLowerCase()) {
-        answerZoneEl.classList.add('correct');
-        score += 100;
-        scoreTextEl.textContent = score;
-        speakText(targetStr);
-
-        setTimeout(() => {
-          currentItemIndex++;
-          if (currentItemIndex < topic.items.length) {
-            loadItem();
-          } else {
-            triggerVictory();
-          }
-        }, 1200);
-      } else {
-        answerZoneEl.classList.add('shake');
-        setTimeout(() => {
-          answerZoneEl.classList.remove('shake');
-        }, 500);
-      }
-    });
-
-    resetBtn.addEventListener('click', loadItem);
-    audioBtn.addEventListener('click', () => {
-      const targetStr = DATA[currentTopicIndex].items[currentItemIndex].target;
-      speakText(targetStr);
-    });
-
-    materiSelect.addEventListener('change', initGame);
-
-    function triggerVictory() {
-      clearInterval(timerInterval);
-      document.getElementById('final-score').textContent = score;
-      document.getElementById('final-time').textContent = timerTextEl.textContent;
-      victoryModal.classList.add('active');
-    }
-
-    setupDropdown();
-    initGame();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
