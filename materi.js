@@ -60,7 +60,3 @@ const DAFTAR_MATERI_SCRAMBLE = [
     ]
   }
 ];
-
-
-
-
