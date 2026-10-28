@@ -89,8 +89,12 @@
     </div>
 
     <div class="action-buttons">
-      <button class="btn btn-secondary" id="reset-btn">🔄 Acak Ulang</button>
-      <button class="btn btn-primary" id="check-btn">✔ Periksa Jawaban</button>
+      <!-- Tombol Mulai Bermain (Muncul saat Standby) -->
+      <button class="btn btn-start" id="start-btn">🚀 Mulai Bermain</button>
+
+      <!-- Tombol Kontrol (Muncul saat Game Berjalan) -->
+      <button class="btn btn-secondary" id="reset-btn" style="display: none;">🔄 Reset</button>
+      <button class="btn btn-primary" id="check-btn" style="display: none;">✔ Periksa Jawaban</button>
     </div>
   </main>
 
@@ -113,7 +117,7 @@
         </div>
       </div>
 
-      <button class="btn btn-primary btn-full" onclick="initGame()">🚀 Main Lagi</button>
+      <button class="btn btn-primary btn-full" onclick="resetToStandby()">🚀 Main Lagi</button>
     </div>
   </div>
 
@@ -123,7 +127,7 @@
       <div class="modal-icon">⌛</div>
       <h2>Waktu Habis!</h2>
       <p>Jangan menyerah, ayo coba lagi untuk menyelesaikan semua soal!</p>
-      <button class="btn btn-primary btn-full" onclick="initGame()">🔄 Coba Lagi</button>
+      <button class="btn btn-primary btn-full" onclick="resetToStandby()">🔄 Coba Lagi</button>
     </div>
   </div>
 
