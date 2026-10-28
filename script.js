@@ -1,4 +1,3 @@
-// Fallback data jika materi.js tidak sengaja terlewat
 const DEFAULT_MATERI = [
   {
     id: "vocab-past-tense",
@@ -20,13 +19,14 @@ let selectedPieces = [];
 let bankPieces = [];
 let score = 0;
 
-// Timer State
-let timerMode = "180"; // "unlimited" or seconds string
+// State Game
+let isGameStarted = false;
+let timerMode = "180";
 let timeRemaining = 180;
 let secondsElapsed = 0;
 let timerInterval = null;
 
-// Audio Synthesizer (Web Audio API)
+// Web Audio API
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playTone(freq, duration, type = "sine") {
@@ -48,13 +48,22 @@ function playSound(name) {
   if (name === "click") playTone(600, 0.08, "sine");
   if (name === "pop") playTone(800, 0.1, "sine");
   if (name === "correct") {
-    playTone(523.25, 0.12); // C5
-    setTimeout(() => playTone(659.25, 0.12), 100); // E5
-    setTimeout(() => playTone(783.99, 0.25), 200); // G5
+    playTone(523.25, 0.12);
+    setTimeout(() => playTone(659.25, 0.12), 100);
+    setTimeout(() => playTone(783.99, 0.25), 200);
   }
   if (name === "wrong") {
     playTone(200, 0.15, "sawtooth");
     setTimeout(() => playTone(150, 0.25, "sawtooth"), 120);
+  }
+}
+
+// Bersihkan Canvas Kembang Api
+function clearFireworks() {
+  const canvas = document.getElementById('fireworks');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 }
 
@@ -68,6 +77,7 @@ const wordBankEl = document.getElementById('word-bank');
 const progressTextEl = document.getElementById('progress-text');
 const scoreTextEl = document.getElementById('score-text');
 const timerTextEl = document.getElementById('timer-text');
+const startBtn = document.getElementById('start-btn');
 const checkBtn = document.getElementById('check-btn');
 const resetBtn = document.getElementById('reset-btn');
 const audioBtn = document.getElementById('audio-btn');
@@ -84,7 +94,12 @@ function setupDropdowns() {
   });
 }
 
-function initGame() {
+// Reset Game ke Posisi Standby (Sebelum Tombol Mulai Diklik)
+function resetToStandby() {
+  clearInterval(timerInterval);
+  clearFireworks();
+  
+  isGameStarted = false;
   currentTopicIndex = parseInt(materiSelect.value) || 0;
   currentItemIndex = 0;
   score = 0;
@@ -95,11 +110,30 @@ function initGame() {
     timeRemaining = parseInt(timerMode);
   }
 
+  // Sembunyikan Modal
   victoryModal.classList.remove('active');
   timeoutModal.classList.remove('active');
-  
-  startTimer();
+
+  // Atur Tampilan Tombol
+  startBtn.style.display = 'inline-flex';
+  checkBtn.style.display = 'none';
+  resetBtn.style.display = 'none';
+
+  updateTimerDisplay();
   loadItem();
+}
+
+// Memulai Game Saat Tombol "Mulai Bermain" Diklik
+function startGame() {
+  playSound("pop");
+  isGameStarted = true;
+
+  // Ubah Tampilan Tombol
+  startBtn.style.display = 'none';
+  checkBtn.style.display = 'inline-flex';
+  resetBtn.style.display = 'inline-flex';
+
+  startTimer();
 }
 
 function startTimer() {
@@ -130,7 +164,7 @@ function updateTimerDisplay() {
   const secs = String(displaySecs % 60).padStart(2, '0');
   timerTextEl.textContent = `${mins}:${secs}`;
 
-  if (timerMode !== "unlimited" && timeRemaining <= 30) {
+  if (timerMode !== "unlimited" && timeRemaining <= 30 && isGameStarted) {
     timerTextEl.classList.add('warning');
   } else {
     timerTextEl.classList.remove('warning');
@@ -165,6 +199,7 @@ function renderChips() {
   answerZoneEl.innerHTML = '';
   selectedPieces.forEach((piece, idx) => {
     const chip = createChip(piece, () => {
+      if (!isGameStarted) return; // Kepingan tidak aktif jika belum tekan Mulai
       playSound("pop");
       selectedPieces.splice(idx, 1);
       bankPieces.push(piece);
@@ -176,6 +211,7 @@ function renderChips() {
   wordBankEl.innerHTML = '';
   bankPieces.forEach((piece, idx) => {
     const chip = createChip(piece, () => {
+      if (!isGameStarted) return; // Kepingan tidak aktif jika belum tekan Mulai
       playSound("click");
       bankPieces.splice(idx, 1);
       selectedPieces.push(piece);
@@ -193,7 +229,6 @@ function createChip(text, onClick) {
   return chip;
 }
 
-// Text-to-Speech Feature
 function speakText(text) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -204,15 +239,18 @@ function speakText(text) {
   }
 }
 
-// Check Logic
+// Event Listeners
+startBtn.addEventListener('click', startGame);
+
 checkBtn.addEventListener('click', () => {
+  if (!isGameStarted) return;
+
   const topic = DATA[currentTopicIndex];
   const targetStr = topic.items[currentItemIndex].target;
   const joinChar = (topic.type === 'word') ? '' : ' ';
   const userStr = selectedPieces.join(joinChar);
 
   if (userStr.toLowerCase() === targetStr.toLowerCase()) {
-    // True
     answerZoneEl.classList.add('correct');
     playSound("correct");
     score += 100;
@@ -228,7 +266,6 @@ checkBtn.addEventListener('click', () => {
       }
     }, 1200);
   } else {
-    // False
     playSound("wrong");
     answerZoneEl.classList.add('shake');
     setTimeout(() => {
@@ -238,6 +275,7 @@ checkBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
+  if (!isGameStarted) return;
   playSound("pop");
   loadItem();
 });
@@ -247,8 +285,8 @@ audioBtn.addEventListener('click', () => {
   speakText(targetStr);
 });
 
-materiSelect.addEventListener('change', initGame);
-timeSelect.addEventListener('change', initGame);
+materiSelect.addEventListener('change', resetToStandby);
+timeSelect.addEventListener('change', resetToStandby);
 
 function triggerVictory() {
   clearInterval(timerInterval);
@@ -265,7 +303,6 @@ function triggerVictory() {
   launchFireworks();
 }
 
-// Simple Canvas Fireworks
 function launchFireworks() {
   const canvas = document.getElementById('fireworks');
   const ctx = canvas.getContext('2d');
@@ -303,6 +340,6 @@ function launchFireworks() {
   animate();
 }
 
-// Start Game
+// Inisialisasi awal ke mode Standby
 setupDropdowns();
-initGame();
+resetToStandby();
